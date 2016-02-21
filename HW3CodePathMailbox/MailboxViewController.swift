@@ -20,6 +20,7 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var listIconView: UIImageView!
     @IBOutlet weak var rescheduleOverlayView: UIImageView!
     @IBOutlet weak var listOverlayView: UIImageView!
+    @IBOutlet weak var contentView: UIView!
     
     let grayColor = UIColor(red: 170.0/255.0, green: 170.0/255.0, blue: 170.0/255.0, alpha: 1.0)
     let yellowColor = UIColor(red: 249.0/255.0, green: 212.0/255.0, blue: 51.0/255.0, alpha: 1.0)
@@ -27,16 +28,21 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
     let greenColor = UIColor(red: 113.0/255.0, green: 217.0/255.0, blue: 98.0/255.0, alpha: 1.0)
     let redColor = UIColor(red: 233.0/255.0, green: 83.0/255.0, blue: 52.0/255.0, alpha: 1.0)
     
+    var contentOriginalCenter: CGPoint!
+    var contentRightOffset: CGFloat!
+    var contentRight: CGPoint!
+    var contentLeft: CGPoint!
+    
     var messageOriginalCenter: CGPoint!
     var archiveIconOriginalCenter: CGPoint!
     var rescheduleIconOriginalCenter: CGPoint!
     var deleteIconOriginalCenter: CGPoint!
     var listIconOriginalCenter: CGPoint!
     
+    var contentStaticCenter: CGPoint!
     var messageStaticCenter: CGPoint!
     var messageStaticRight: CGPoint!
     var messageStaticLeft: CGPoint!
-    
     var leftIconsStaticCenter: CGPoint!
     var rightIconsStaticCenter: CGPoint!
     
@@ -47,6 +53,10 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
         scrollView.delegate = self
         scrollView.contentInset.bottom = messageView.frame.height
         
+        contentRightOffset = 290
+        contentLeft = contentView.center
+        contentRight = CGPoint(x: contentView.center.x + contentRightOffset, y: contentView.center.y)
+        
         // Set the initial alpha of the hidden icons at zero
         listIconView.alpha = 0.0
         deleteIconView.alpha = 0.0
@@ -54,12 +64,17 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
         listOverlayView.alpha = 0.0
         
         // set the reset locations of all items
+        contentStaticCenter = contentView.center
         messageStaticCenter = messageView.center
         messageStaticRight = CGPoint(x: 600.0, y: messageView.center.y)
         messageStaticLeft = CGPoint(x: -600.0, y: messageView.center.y)
         
         leftIconsStaticCenter = archiveIconView.center
         rightIconsStaticCenter = rescheduleIconView.center
+        
+        var edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: "onEdgePan:")
+        edgeGesture.edges = UIRectEdge.Left
+        contentView.addGestureRecognizer(edgeGesture)
         
 
     }
@@ -93,6 +108,7 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
 //    @IBAction func didMessagePan(sender: AnyObject) {
 //    }
     
+   
     @IBAction func didTapRescheduleOverlay(sender: UITapGestureRecognizer) {
         rescheduleOverlayView.alpha = 0.0
 
@@ -118,6 +134,49 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
                 self.resetMessageItems()
 
         }
+    }
+
+    @IBAction func onEdgePan(sender: UIScreenEdgePanGestureRecognizer) {
+        print("It's edge panning")
+        var point = sender.locationInView(view)
+        var velocity = sender.velocityInView(view)
+        var translation = sender.translationInView(view)
+        
+        if sender.state == UIGestureRecognizerState.Began {
+            print("Edge pan began at: \(point)")
+            contentOriginalCenter = contentView.center
+        } else if sender.state == UIGestureRecognizerState.Changed {
+            print("Edge pan changed at: \(point)")
+            contentView.center = CGPoint(x: contentOriginalCenter.x + translation.x, y: contentOriginalCenter.y)
+            
+            
+            
+            
+        } else if sender.state == UIGestureRecognizerState.Ended {
+            print("Edge pan ended at: \(point)")
+            
+            if velocity.x > 0 {
+                
+                UIView.animateWithDuration(0.1, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 1.0, options: [], animations: { () -> Void in
+                    self.contentView.center = self.contentRight
+                    }, completion: { (Bool) -> Void in
+                        
+                })
+                
+            } else {
+
+                UIView.animateWithDuration(0.1, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 1.0, options: [], animations: { () -> Void in
+                    self.contentView.center = self.contentLeft
+                    }, completion: { (Bool) -> Void in
+                        
+                })
+
+                
+            }
+        }
+        
+        
+        
     }
     
     
