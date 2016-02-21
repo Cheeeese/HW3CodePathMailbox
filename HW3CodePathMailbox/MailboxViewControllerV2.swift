@@ -11,11 +11,8 @@ import UIKit
 class MailboxViewController: UIViewController, UIScrollViewDelegate {
 
     @IBOutlet weak var scrollView: UIScrollView!
-    @IBOutlet weak var rescheduleScrollView: UIScrollView!
-    @IBOutlet weak var archiveScrollView: UIScrollView!
     @IBOutlet weak var messageView: UIImageView!
     @IBOutlet weak var messageBackgroundView: UIView!
-
     
     @IBOutlet weak var rescheduleIconView: UIImageView!
     @IBOutlet weak var archiveIconView: UIImageView!
@@ -32,7 +29,6 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
     let brownColor = UIColor(red: 217.0/255.0, green: 167.0/255.0, blue: 117.0/255.0, alpha: 1.0)
     let greenColor = UIColor(red: 113.0/255.0, green: 217.0/255.0, blue: 98.0/255.0, alpha: 1.0)
     let redColor = UIColor(red: 233.0/255.0, green: 83.0/255.0, blue: 52.0/255.0, alpha: 1.0)
-    let blueColor = UIColor(red: 96.0/255.0, green: 191.0/255.0, blue: 222.0/255.0, alpha: 1.0)
     
     var contentOriginalCenter: CGPoint!
     var contentRightOffset: CGFloat!
@@ -57,29 +53,15 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
     var composeDown: CGPoint!
     var composeOffset: CGFloat!
     
-    @IBOutlet weak var contentMenuScrollView: UIScrollView!
     @IBOutlet weak var contentMenuControl: UISegmentedControl!
-//    var contentMenuPage: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        print("Content Menu Scroll is at \(contentMenuScrollView.center)")
-        print("Content view is at \(contentView.center)")
-        
-        // Enable Vertical Scrolling
+        // Enable Scrolling
         scrollView.contentSize = CGSize(width: 320, height: 2300)
         scrollView.delegate = self
         scrollView.contentInset.bottom = messageView.frame.height
-        
-        rescheduleScrollView.contentSize = CGSize(width: 320, height: 2300)
-        archiveScrollView.contentSize = CGSize(width: 320, height: 2300)
-        
-        
-        
-        // Enable Horizontal Scrolling for Menues
-        contentMenuScrollView.contentSize = CGSize(width: 960, height: 568)
-        // contentMenuScrollView.delegate = self
         
         // Enable content offset for Edge Pan Animation
         contentRightOffset = 290
@@ -115,38 +97,11 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
         composeView.center = composeDown
         
         contentMenuControl.selectedSegmentIndex = 1
-        contentMenuScrollView.contentOffset.x = 0
         
     }
     
     @IBAction func onContentMenuControlChange(sender: UISegmentedControl) {
         print(contentMenuControl.selectedSegmentIndex)
-        if contentMenuControl.selectedSegmentIndex == 0 {
-            contentMenuControl.tintColor = yellowColor
-            UIView.animateWithDuration(0.1, animations: { () -> Void in
-                self.contentMenuScrollView.contentOffset.x = -320
-                }, completion: { (Bool) -> Void in
-                    
-            })
-            
-        } else if contentMenuControl.selectedSegmentIndex == 1 {
-            contentMenuControl.tintColor = blueColor
-            UIView.animateWithDuration(0.1, animations: { () -> Void in
-                self.contentMenuScrollView.contentOffset.x = 0
-                }, completion: { (Bool) -> Void in
-                    
-            })
-            
-        } else if contentMenuControl.selectedSegmentIndex == 2 {
-            contentMenuControl.tintColor = greenColor
-            UIView.animateWithDuration(0.1, animations: { () -> Void in
-                self.contentMenuScrollView.contentOffset.x = 320
-                }, completion: { (Bool) -> Void in
-                    
-            })
-            
-        }
-        
     }
 
     

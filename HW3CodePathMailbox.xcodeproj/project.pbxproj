@@ -486,6 +486,7 @@
 				44A5E1121C79340C00EF1AC2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		44A5E1131C79340C00EF1AC2 /* Build configuration list for PBXNativeTarget "HW3CodePathMailboxTests" */ = {
 			isa = XCConfigurationList;
@@ -494,6 +495,7 @@
 				44A5E1151C79340C00EF1AC2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		44A5E1161C79340C00EF1AC2 /* Build configuration list for PBXNativeTarget "HW3CodePathMailboxUITests" */ = {
 			isa = XCConfigurationList;
@@ -502,6 +504,7 @@
 				44A5E1181C79340C00EF1AC2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
