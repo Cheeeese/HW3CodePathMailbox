@@ -21,6 +21,8 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var rescheduleOverlayView: UIImageView!
     @IBOutlet weak var listOverlayView: UIImageView!
     @IBOutlet weak var contentView: UIView!
+
+    @IBOutlet weak var composeView: UIView!
     
     let grayColor = UIColor(red: 170.0/255.0, green: 170.0/255.0, blue: 170.0/255.0, alpha: 1.0)
     let yellowColor = UIColor(red: 249.0/255.0, green: 212.0/255.0, blue: 51.0/255.0, alpha: 1.0)
@@ -45,6 +47,11 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
     var messageStaticLeft: CGPoint!
     var leftIconsStaticCenter: CGPoint!
     var rightIconsStaticCenter: CGPoint!
+    
+    var composeOriginalCenter: CGPoint!
+    var composeUp: CGPoint!
+    var composeDown: CGPoint!
+    var composeOffset: CGFloat!
     
     
     override func viewDidLoad() {
@@ -71,6 +78,12 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
         
         leftIconsStaticCenter = archiveIconView.center
         rightIconsStaticCenter = rescheduleIconView.center
+        
+        composeView.alpha = 0.0
+        composeUp = composeView.center
+        composeOffset = 700
+        composeDown = CGPoint(x: composeView.center.x, y: composeView.center.y + composeOffset)
+        composeView.center = composeDown
         
         var edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: "onEdgePan:")
         edgeGesture.edges = UIRectEdge.Left
@@ -109,6 +122,29 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
 //    }
     
    
+    @IBAction func didPressCompose(sender: AnyObject) {
+
+        composeView.alpha = 1.0
+        UIView.animateWithDuration(0.1, delay: 0, options: [], animations: { () -> Void in
+            self.composeView.center = self.composeUp
+            }) { (Bool) -> Void in
+                
+        }
+        
+    }
+    
+    @IBAction func didPressCancelCompose(sender: AnyObject) {
+
+        UIView.animateWithDuration(0.05, delay: 0, options: [], animations: { () -> Void in
+            self.composeView.center = self.composeDown
+            }) { (Bool) -> Void in
+                self.composeView.alpha = 0.0
+                
+        }
+
+        
+    }
+    
     @IBAction func didTapRescheduleOverlay(sender: UITapGestureRecognizer) {
         rescheduleOverlayView.alpha = 0.0
 
