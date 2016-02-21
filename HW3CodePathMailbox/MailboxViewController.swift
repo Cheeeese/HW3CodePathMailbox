@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MailboxViewController: UIViewController {
+class MailboxViewController: UIViewController, UIScrollViewDelegate {
 
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var messageView: UIImageView!
@@ -18,6 +18,8 @@ class MailboxViewController: UIViewController {
     @IBOutlet weak var archiveIconView: UIImageView!
     @IBOutlet weak var deleteIconView: UIImageView!
     @IBOutlet weak var listIconView: UIImageView!
+    @IBOutlet weak var rescheduleOverlayView: UIImageView!
+    @IBOutlet weak var listOverlayView: UIImageView!
     
     let grayColor = UIColor(red: 170.0/255.0, green: 170.0/255.0, blue: 170.0/255.0, alpha: 1.0)
     let yellowColor = UIColor(red: 249.0/255.0, green: 212.0/255.0, blue: 51.0/255.0, alpha: 1.0)
@@ -35,20 +37,31 @@ class MailboxViewController: UIViewController {
     var messageStaticRight: CGPoint!
     var messageStaticLeft: CGPoint!
     
+    var leftIconsStaticCenter: CGPoint!
+    var rightIconsStaticCenter: CGPoint!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         scrollView.contentSize = CGSize(width: 320, height: 2300)
+        scrollView.delegate = self
+        scrollView.contentInset.bottom = messageView.frame.height
         
         // Set the initial alpha of the hidden icons at zero
         listIconView.alpha = 0.0
         deleteIconView.alpha = 0.0
+        rescheduleOverlayView.alpha = 0.0
+        listOverlayView.alpha = 0.0
+        
+        // set the reset locations of all items
         messageStaticCenter = messageView.center
-        messageStaticRight = CGPoint(x: 500.0, y: messageView.center.y)
-        messageStaticLeft = CGPoint(x: -500.0, y: messageView.center.y)
+        messageStaticRight = CGPoint(x: 600.0, y: messageView.center.y)
+        messageStaticLeft = CGPoint(x: -600.0, y: messageView.center.y)
+        
+        leftIconsStaticCenter = archiveIconView.center
+        rightIconsStaticCenter = rescheduleIconView.center
         
 
-        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
@@ -56,8 +69,58 @@ class MailboxViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    func resetMessageItems() {
+        messageView.center = messageStaticCenter
+        archiveIconView.center = leftIconsStaticCenter
+        deleteIconView.center = leftIconsStaticCenter
+        rescheduleIconView.center = rightIconsStaticCenter
+        listIconView.center = rightIconsStaticCenter
+        listIconView.alpha = 0.0
+        deleteIconView.alpha = 0.0
+        archiveIconView.alpha = 1.0
+        rescheduleIconView.alpha = 1.0
+        
+    }
+    
+    func iconsFollowMessagePan() {
+        rescheduleIconView.center = CGPoint(x: messageView.center.x + 180.0, y: rescheduleIconOriginalCenter.y)
+        listIconView.center = CGPoint(x: messageView.center.x + 180.0, y: listIconOriginalCenter.y)
+        archiveIconView.center = CGPoint(x: messageView.center.x - 180.0, y: archiveIconOriginalCenter.y)
+        deleteIconView.center = CGPoint(x: messageView.center.x - 180.0, y: deleteIconOriginalCenter.y)
+        
+    }
+    
 //    @IBAction func didMessagePan(sender: AnyObject) {
 //    }
+    
+    @IBAction func didTapRescheduleOverlay(sender: UITapGestureRecognizer) {
+        rescheduleOverlayView.alpha = 0.0
+
+        UIView.animateWithDuration(0.05, delay: 0, options: [], animations: { () -> Void in
+            
+            self.scrollView.contentOffset.y = self.scrollView.contentInset.bottom
+            
+            }) { (Bool) -> Void in
+                self.resetMessageItems()
+                
+        }
+
+    }
+    
+    @IBAction func didTapListOverlay(sender: UITapGestureRecognizer) {
+        
+        self.listOverlayView.alpha = 0.0
+        UIView.animateWithDuration(0.05, delay: 0, options: [], animations: { () -> Void in
+
+            self.scrollView.contentOffset.y = self.scrollView.contentInset.bottom
+
+            }) { (Bool) -> Void in
+                self.resetMessageItems()
+
+        }
+    }
+    
+    
     
     @IBAction func didPanMessage(sender: UIPanGestureRecognizer) {
         var point = sender.locationInView(view)
@@ -77,17 +140,13 @@ class MailboxViewController: UIViewController {
         
             
         } else if sender.state == UIGestureRecognizerState.Changed {
-            // print("Gesture changed at: \(point)")
+
+            // Move the message view as you pan
             messageView.center = CGPoint(x: messageOriginalCenter.x + translation.x, y: messageOriginalCenter.y)
 
-            // Move the icons as the message pans outside the center range
+            // Have the icons follow the message if it pans outside the center range
             if messageView.center.x <= 100 || messageView.center.x >= 220 {
-                rescheduleIconView.center = CGPoint(x: messageView.center.x + 180.0, y: rescheduleIconOriginalCenter.y)
-                listIconView.center = CGPoint(x: messageView.center.x + 180.0, y: listIconOriginalCenter.y)
-                archiveIconView.center = CGPoint(x: messageView.center.x - 180.0, y: archiveIconOriginalCenter.y)
-                deleteIconView.center = CGPoint(x: messageView.center.x - 180.0, y: deleteIconOriginalCenter.y)
-
-
+                iconsFollowMessagePan()
             }
             
 
@@ -127,15 +186,14 @@ class MailboxViewController: UIViewController {
 
             }
             
-            print(messageView.center.x)
 
         } else if sender.state == UIGestureRecognizerState.Ended {
             print("Gesture ended at: \(point)")
+
             
             if messageView.center.x > 100 && messageView.center.x < 220 || messageView.center.x > 100 && velocity.x < 0.0 || messageView.center.x < 220 && velocity.x > 0.0 {
 
                 
-                print("velocity is \(velocity)")
                 UIView.animateWithDuration(0.05, animations: { () -> Void in
                     self.messageView.center = self.messageStaticCenter
                     
@@ -144,31 +202,57 @@ class MailboxViewController: UIViewController {
                 
             } else if messageView.center.x >= 220 && messageView.center.x < 420 && velocity.x > 0.0 {
 
-                UIView.animateWithDuration(0.05, animations: { () -> Void in
+                UIView.animateWithDuration(0.05, delay: 0.0, options: [], animations: { () -> Void in
                     self.messageView.center = self.messageStaticRight
+                    self.iconsFollowMessagePan()
                     
+                    
+                    }, completion: { (Bool) -> Void in
+                        UIView.animateWithDuration(0.05, delay: 0, options: [], animations: { () -> Void in
+                            self.scrollView.contentOffset.y = self.scrollView.contentInset.bottom
+                            }, completion: { (Bool) -> Void in
+                                self.resetMessageItems()
+                        })
                 })
                 
                 
             } else if messageView.center.x >= 420 && velocity.x > 0.0 {
-
-                UIView.animateWithDuration(0.05, animations: { () -> Void in
+                
+                UIView.animateWithDuration(0.05, delay: 0.0, options: [], animations: { () -> Void in
                     self.messageView.center = self.messageStaticRight
+                    self.iconsFollowMessagePan()
                     
+                    }, completion: { (Bool) -> Void in
+                        UIView.animateWithDuration(0.05, delay: 0, options: [], animations: { () -> Void in
+                            self.scrollView.contentOffset.y = self.scrollView.contentInset.bottom
+                            }, completion: { (Bool) -> Void in
+                                self.resetMessageItems()
+                        })
                 })
+
                 
             } else if messageView.center.x <= 100 && messageView.center.x > -100 && velocity.x < 0.0 {
                 
-                UIView.animateWithDuration(0.05, animations: { () -> Void in
+                UIView.animateWithDuration(0.05, delay: 0.0, options: [], animations: { () -> Void in
                     self.messageView.center = self.messageStaticLeft
+                    self.iconsFollowMessagePan()
                     
+                    }, completion: { (Bool) -> Void in
+                        UIView.animateWithDuration(0.05, animations: { () -> Void in
+                            self.rescheduleOverlayView.alpha = 1.0
+                        })
                 })
                 
             } else if messageView.center.x <= -100 && velocity.x < 0.0 {
                 
-                UIView.animateWithDuration(0.05, animations: { () -> Void in
+                UIView.animateWithDuration(0.05, delay: 0.0, options: [], animations: { () -> Void in
                     self.messageView.center = self.messageStaticLeft
+                    self.iconsFollowMessagePan()
                     
+                    }, completion: { (Bool) -> Void in
+                        UIView.animateWithDuration(0.05, animations: { () -> Void in
+                            self.listOverlayView.alpha = 1.0
+                        })
                 })
                 
             }
