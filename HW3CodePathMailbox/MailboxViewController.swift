@@ -194,9 +194,6 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
         
     }
     
-//    @IBAction func didMessagePan(sender: AnyObject) {
-//    }
-    
    
     @IBAction func didPressCompose(sender: AnyObject) {
 
@@ -326,6 +323,8 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
             
             if messageView.center.x > 100 && messageView.center.x < 220 {
                 messageBackgroundView.backgroundColor = grayColor
+                archiveIconView.alpha = (messageView.center.x * (1.0/60.0) - 160.0/60.0)
+                rescheduleIconView.alpha = (messageView.center.x * (-1.0/60.0) + 160.0/60.0)
 
                 
             } else if messageView.center.x <= 100 &&  messageView.center.x > -100 {
@@ -381,6 +380,7 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate {
                     }, completion: { (Bool) -> Void in
                         UIView.animateWithDuration(0.05, delay: 0, options: [], animations: { () -> Void in
                             self.scrollView.contentOffset.y = self.scrollView.contentInset.bottom
+
                             }, completion: { (Bool) -> Void in
                                 self.resetMessageItems()
                         })
