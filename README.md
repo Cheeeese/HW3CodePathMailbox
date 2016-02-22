@@ -25,6 +25,7 @@ Completed user stories:
 * [x] Optional: If the menu is being hidden when the user lifts their finger, it should continue hiding.
 * [x] Optional: Tapping on compose should animate to reveal the compose view.
 * [x] Optional: Tapping the segmented control in the title should swipe views in from the left or right.
+* [ ] Optional: Implement shake to undo (DID NOT COMPLETE)
 
 ![Video Walkthrough](HW3_withOptionals.gif)
 
