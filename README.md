@@ -8,12 +8,14 @@ Time spent: ~12 hours developing required pieces
 
 Completed user stories:
 * [x] User can drag a message left to either reschedule or show the list overlay 
+  * The later icon will fade in as the user pans 
   * At 60 pts, the later icon moves with the drag and the background changes to yellow
   * Upon release, the message should continue to reveal the yellow background. When the animation it complete, it should show the reschedule options.
   * After 260 pts, the icon should change to the list icon and the background color should change to brown.
   * Upon release, the message should continue to reveal the brown background. When the animation it complete, it should show the list options.
   * User can tap to dismissing the reschedule or list options. After the reschedule or list options are dismissed, you should see the message finish the hide animation.
 * [x] User can drag a message right to either archive or delete the message
+  * The archive icon will fade in as the user pans
   * After 60 pts, the archive icon should start moving with the translation and the background should change to green.
   * Upon release, the message should continue to reveal the green background. When the animation it complete, it should hide the message.
   * After 260 pts, the icon should change to the delete icon and the background color should change to red.
